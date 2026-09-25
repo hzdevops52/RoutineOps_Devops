@@ -1,0 +1,25 @@
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.23"
+    }
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.10.0"  # Required for OCI support
+    }
+
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2.0"
+    }
+  }
+}

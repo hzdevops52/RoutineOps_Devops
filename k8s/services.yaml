@@ -1,0 +1,35 @@
+# k8s/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: routine-app
+spec:
+  selector:
+    app: mongo
+  ports:
+    - port: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: routine-app
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: routine-app
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 3000
