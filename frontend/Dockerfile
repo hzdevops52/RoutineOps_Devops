@@ -26,7 +26,7 @@ COPY . .
 
 # Build-time env vars (non-secret, baked into the JS bundle)
 # Secret values must NOT go here — use runtime env instead
-ARG NEXT_PUBLIC_API_URL=http://localhost:5000
+ARG NEXT_PUBLIC_API_URL=http://backend:4000/api
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Disable Next.js telemetry during build

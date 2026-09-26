@@ -41,11 +41,11 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 # Document the port (actual binding controlled by docker-compose)
-EXPOSE 5000
+EXPOSE 4000
 
 # Environment defaults (overridden by docker-compose / CI secrets)
 ENV NODE_ENV=production \
-    PORT=5000
+    PORT=4000
 
 # dumb-init ensures SIGTERM is forwarded correctly to node
 # so docker stop / k8s pod eviction does a clean graceful shutdown
