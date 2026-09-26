@@ -2,54 +2,56 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
-  build-and-push:
+  test-lint-build:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    # Setup Node
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
-    # Backend deps
-    - name: Install Backend Dependencies
-      working-directory: backend
-      run: npm install
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
 
-    # Frontend deps
-    - name: Install Frontend Dependencies
-      working-directory: frontend
-      run: npm install
+      - name: Run backend tests
+        working-directory: backend
+        run: npm test
 
-    # Build frontend
-    - name: Build Frontend
-      working-directory: frontend
-      run: npm run build
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
 
-    # 🔐 Login Docker Hub
-    - name: Login to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: Run frontend lint
+        working-directory: frontend
+        run: npm run lint
 
-    # 🐳 Build + Tag Backend
-    - name: Build Backend Image
-      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/routine-backend:latest ./backend
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
 
-    # 🐳 Build + Tag Frontend
-    - name: Build Frontend Image
-      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/routine-frontend:latest ./frontend
+      - name: Build backend Docker image
+        run: docker build -t routineops-backend:${{ github.sha }} ./backend
 
-    # 🚀 Push Backend
-    - name: Push Backend Image
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/routine-backend:latest
+      - name: Build frontend Docker image
+        run: docker build -t routineops-frontend:${{ github.sha }} ./frontend
 
-    # 🚀 Push Frontend
-    - name: Push Frontend Image
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/routine-frontend:latest
+      - name: Deployment status
+        run: |
+          echo "CI/CD pipeline completed successfully."
+          echo "Commit: ${{ github.sha }}"
+          echo "Backend image: routineops-backend:${{ github.sha }}"
+          echo "Frontend image: routineops-frontend:${{ github.sha }}"
